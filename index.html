@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LINE 對話重點整理</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f6f2;
+    --surface: #ffffff;
+    --surface2: #f2f1ed;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.18);
+    --text: #1a1a1a;
+    --muted: #6b6b6b;
+    --accent: #5b4de8;
+    --accent-light: #eeedfe;
+    --accent-mid: #7f77dd;
+    --green: #1D9E75;
+    --amber: #BA7517;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  .wrapper {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .header {
+    margin-bottom: 2rem;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .line-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    background: #06C755;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .line-badge svg { width: 18px; height: 18px; fill: white; }
+
+  .header p {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 10px;
+  }
+
+  input[type="password"], textarea {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 10px 12px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: var(--surface2);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input[type="password"]:focus, textarea:focus {
+    border-color: var(--accent-mid);
+    background: var(--surface);
+  }
+
+  input[type="password"] { font-family: monospace; }
+
+  textarea {
+    min-height: 200px;
+    resize: vertical;
+    line-height: 1.65;
+  }
+
+  .api-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .api-row input { flex: 1; }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+  }
+
+  .chip {
+    font-size: 13px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .chip:hover { border-color: var(--accent-mid); color: var(--text); }
+
+  .chip.active {
+    background: var(--accent-light);
+    border-color: var(--accent-mid);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 500;
+    padding: 11px 24px;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    font-family: inherit;
+  }
+
+  .btn:hover { opacity: 0.88; }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.65s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .progress-bar {
+    width: 100%; height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .progress-label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .error {
+    background: #fff1f0;
+    border: 1px solid #ffa39e;
+    color: #cf1322;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 14px;
+    margin-top: 1rem;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 1.5rem;
+  }
+
+  .result-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .result-header span {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .copy-btn {
+    font-size: 12px;
+    padding: 4px 12px;
+    border: 1px solid var(--border2);
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+    color: var(--muted);
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { background: var(--surface2); color: var(--text); }
+
+  .result-body { padding: 1.25rem; }
+
+  .section {
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .summary-text {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text);
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .tag {
+    font-size: 13px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: 14px;
+    line-height: 1.65;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+
+  .dot-purple { background: var(--accent-mid); }
+  .dot-green { background: var(--green); }
+  .dot-amber { background: var(--amber); }
+
+  .hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="header">
+    <h1>
+      <div class="line-badge">
+        <svg viewBox="0 0 24 24"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+      </div>
+      LINE 對話重點整理
+    </h1>
+    <p>貼入對話紀錄，AI 自動幫你整理摘要、待辦與決定事項</p>
+  </div>
+
+  <!-- API Key -->
+  <div class="card">
+    <div class="card-label">Gemini API Key</div>
+    <div class="api-row">
+      <input type="password" id="apiKey" placeholder="貼入你的 Gemini API Key（AIza...）" />
+    </div>
+    <div class="hint">取得 API Key：<a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a> → 免費使用</div>
+  </div>
+
+  <!-- 對話輸入 -->
+  <div class="card">
+    <div class="card-label">LINE 對話紀錄</div>
+    <textarea id="chatInput" placeholder="直接從 LINE 複製對話貼入即可，例如：
+
+[2024/04/07 10:32] 小明：明天的會議幾點開始？
+[2024/04/07 10:33] 小華：下午3點，記得帶企劃書
+[2024/04/07 10:35] 小明：好的，我會準備好的
+
+有無時間戳都可以，中文英文都支援"></textarea>
+  </div>
+
+  <!-- 整理項目選擇 -->
+  <div class="card">
+    <div class="card-label">選擇整理項目（可多選）</div>
+    <div class="chips" id="chips">
+      <div class="chip active" data-val="summary">📋 重點摘要</div>
+      <div class="chip active" data-val="actions">✅ 待辦事項</div>
+      <div class="chip" data-val="decisions">🔨 決定事項</div>
+      <div class="chip" data-val="topics">🏷️ 主要話題</div>
+      <div class="chip" data-val="followup">🔔 需跟進事項</div>
+    </div>
+  </div>
+
+  <button class="btn" id="analyzeBtn" onclick="analyze()">
+    <span id="btnContent">✦ 開始整理</span>
+  </button>
+
+  <div id="progressArea" style="display:none; margin-top: 1rem;">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">AI 正在分析對話中...</div>
+  </div>
+
+  <div id="errorMsg" class="error" style="display:none"></div>
+  <div id="resultArea"></div>
+
+</div>
+
+<script>
+document.querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', () => c.classList.toggle('active'));
+});
+
+let progressTimer = null;
+
+function startProgress() {
+  const fill = document.getElementById('progressFill');
+  const label = document.getElementById('progressLabel');
+  const msgs = ['分析對話結構中...', 'AI 閱讀對話內容...', '整理重點與待辦...', '即將完成...'];
+  let pct = 0, step = 0;
+  fill.style.width = '0%';
+  document.getElementById('progressArea').style.display = 'block';
+  progressTimer = setInterval(() => {
+    if (pct < 85) {
+      pct += Math.random() * 12;
+      if (pct > 85) pct = 85;
+      fill.style.width = pct + '%';
+      if (step < msgs.length - 1 && pct > (step + 1) * 22) {
+        label.textContent = msgs[++step];
+      }
+    }
+  }, 400);
+}
+
+function stopProgress() {
+  clearInterval(progressTimer);
+  const fill = document.getElementById('progressFill');
+  fill.style.width = '100%';
+  setTimeout(() => {
+    document.getElementById('progressArea').style.display = 'none';
+    fill.style.width = '0%';
+  }, 400);
+}
+
+async function analyze() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const text = document.getElementById('chatInput').value.trim();
+  const selected = [...document.querySelectorAll('.chip.active')].map(c => c.dataset.val);
+
+  if (!apiKey) return showError('請先填入 Gemini API Key');
+  if (!text) return showError('請貼入 LINE 對話紀錄');
+  if (!selected.length) return showError('請至少選擇一個整理項目');
+
+  const btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  document.getElementById('btnContent').innerHTML = '<span class="spinner"></span> 分析中...';
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('resultArea').innerHTML = '';
+  startProgress();
+
+  const sectionMap = {
+    summary: '重點摘要（3–5句話，說明對話的核心內容）',
+    actions: '待辦事項（每項附上負責人，如有的話）',
+    decisions: '已決定事項（對話中明確決定了什麼）',
+    topics: '主要話題標籤（3–8個關鍵詞）',
+    followup: '需要跟進的事項（未解決或待確認的問題）'
+  };
+
+  const requested = selected.map(k => `- ${sectionMap[k]}`).join('\n');
+
+  const prompt = `你是一個專業的對話整理助手。請仔細分析以下 LINE 對話紀錄，整理出以下內容（以繁體中文回覆）：
+
+${requested}
+
+請只回覆 JSON，不要有任何 markdown 標記、說明文字或多餘內容。格式如下（只包含被要求的欄位）：
+{
+  "summary": "摘要文字",
+  "actions": ["待辦1（負責人：OO）", "待辦2"],
+  "decisions": ["決定1", "決定2"],
+  "topics": ["話題1", "話題2", "話題3"],
+  "followup": ["跟進事項1", "跟進事項2"]
+}
+
+LINE 對話紀錄如下：
+---
+${text}
+---`;
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.3, maxOutputTokens: 1500 }
+        })
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    stopProgress();
+    renderResult(parsed, selected);
+  } catch (e) {
+    stopProgress();
+    showError('分析失敗：' + (e.message || e));
+  }
+
+  btn.disabled = false;
+  document.getElementById('btnContent').textContent = '✦ 重新整理';
+}
+
+function renderResult(data, selected) {
+  const labelMap = {
+    summary: '重點摘要',
+    actions: '待辦事項',
+    decisions: '決定事項',
+    topics: '主要話題',
+    followup: '需跟進事項'
+  };
+
+  let bodyHtml = '';
+
+  if (selected.includes('summary') && data.summary) {
+    bodyHtml += `<div class="section">
+      <div class="section-title">${labelMap.summary}</div>
+      <div class="summary-text">${data.summary}</div>
+    </div>`;
+  }
+
+  if (selected.includes('topics') && data.topics?.length) {
+    bodyHtml += `<div class="section">
+      <div class="section-title">${labelMap.topics}</div>
+      <div class="tags">${data.topics.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+    </div>`;
+  }
+
+  if (selected.includes('actions') && data.actions?.length) {
+    bodyHtml += `<div class="section">
+      <div class="section-title">${labelMap.actions}</div>
+      ${data.actions.map(a => `<div class="item"><div class="dot dot-purple"></div><div>${a}</div></div>`).join('')}
+    </div>`;
+  }
+
+  if (selected.includes('decisions') && data.decisions?.length) {
+    bodyHtml += `<div class="section">
+      <div class="section-title">${labelMap.decisions}</div>
+      ${data.decisions.map(d => `<div class="item"><div class="dot dot-green"></div><div>${d}</div></div>`).join('')}
+    </div>`;
+  }
+
+  if (selected.includes('followup') && data.followup?.length) {
+    bodyHtml += `<div class="section">
+      <div class="section-title">${labelMap.followup}</div>
+      ${data.followup.map(f => `<div class="item"><div class="dot dot-amber"></div><div>${f}</div></div>`).join('')}
+    </div>`;
+  }
+
+  const fullText = buildPlainText(data, selected, labelMap);
+
+  document.getElementById('resultArea').innerHTML = `
+    <div class="result-card">
+      <div class="result-header">
+        <span>整理結果</span>
+        <button class="copy-btn" onclick="copyResult(this, \`${escapeBacktick(fullText)}\`)">複製全部</button>
+      </div>
+      <div class="result-body">${bodyHtml}</div>
+    </div>`;
+}
+
+function buildPlainText(data, selected, labelMap) {
+  let lines = [];
+  if (selected.includes('summary') && data.summary) {
+    lines.push(`【${labelMap.summary}】\n${data.summary}`);
+  }
+  if (selected.includes('topics') && data.topics?.length) {
+    lines.push(`【${labelMap.topics}】\n${data.topics.join('、')}`);
+  }
+  if (selected.includes('actions') && data.actions?.length) {
+    lines.push(`【${labelMap.actions}】\n${data.actions.map(a => '• ' + a).join('\n')}`);
+  }
+  if (selected.includes('decisions') && data.decisions?.length) {
+    lines.push(`【${labelMap.decisions}】\n${data.decisions.map(d => '• ' + d).join('\n')}`);
+  }
+  if (selected.includes('followup') && data.followup?.length) {
+    lines.push(`【${labelMap.followup}】\n${data.followup.map(f => '• ' + f).join('\n')}`);
+  }
+  return lines.join('\n\n');
+}
+
+function escapeBacktick(str) {
+  return str.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
+}
+
+function copyResult(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '已複製 ✓';
+    setTimeout(() => btn.textContent = '複製全部', 2000);
+  });
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+</script>
+</body>
+</html>
